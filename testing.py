@@ -1,5 +1,5 @@
 import math
-
+"""
 def euclidH(state):
         count = 0
         rows = [[state[0],state[1],state[2]],[state[3],state[4],state[5]],[state[6],state[7],state[8]]]
@@ -26,3 +26,16 @@ def euclidH(state):
 blah = [4,2,3,7,5,6,1,8,0]
 
 print(euclidH(blah))
+"""
+
+class Problem:
+    def __init__(self) -> None:
+        pass
+        
+
+tester = Problem()
+
+
+
+if(tester):
+    print("tester is True")

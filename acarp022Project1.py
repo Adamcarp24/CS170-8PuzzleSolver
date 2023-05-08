@@ -130,6 +130,8 @@ class AlgoSelector:
     def __init__(self, method,initial):
         self.method = method
         self.initial = initial
+        self.totalExpanded = 0
+        self.maxQ = 1
 
     def run(self):
         if(self.method == 1):
@@ -149,7 +151,14 @@ class AlgoSelector:
             #no solution
             if(problem.frontier == []): return False
 
+            if(len(problem.frontier) > self.maxQ):
+                self.maxQ = len(problem.frontier)
+            #expand first in frontier
             problem.expanded.append(problem.frontier.pop(0))
+            self.totalExpanded += 1
+
+            #expand state for terminal
+            self.output(problem.expanded[len(problem.expanded)-1])
 
             #if expanded node is the goal then return said node
             if(problem.expanded[len(problem.expanded)-1].state == problem.goalState): return problem.expanded[len(problem.expanded)-1]
@@ -170,13 +179,20 @@ class AlgoSelector:
             #no solution
             if(problem.frontier == []): return False
 
+            if(len(problem.frontier) > self.maxQ):
+                self.maxQ = len(problem.frontier)
+            #expand first in frontier
             problem.expanded.append(problem.frontier.pop(0))
+            self.totalExpanded += 1
 
-            ############ Update for better goal state ################
+            #expand state for terminal
+            self.output(problem.expanded[len(problem.expanded)-1])
+
             #if expanded node is the goal then return said node
             if(problem.expanded[len(problem.expanded)-1].state == problem.goalState): 
                 bestGoal = problem.expanded[len(problem.expanded)-1]
                 #check rest of frontier for a better goal node state
+                print("Checking the rest of frontier for a better solution...")
                 for n in problem.frontier:
                     if((n.state == problem.goalState) and (bestGoal.gval > n.gval)):
                         bestGoal = n   
@@ -186,6 +202,15 @@ class AlgoSelector:
             problem.createChildren(problem.expanded[len(problem.expanded)-1], code)
             #sort frontier
             problem.frontier.sort(key=lambda x: x.gval+x.hval)
+
+    #output function for expanding states with g & h values
+    def output(self, node):
+        print("\nThe best state to expand with g(n) = " + str(node.gval) + " and h(n) = " + str(node.hval) + " is...")
+        for i in range(0, len(node.state)):
+            print(str(node.state[i]) + " ", end="")
+            if ((i+1)%3 == 0):
+                print("")
+        print("Expanding this node...\n")
 
 #main
 while(True):
@@ -223,4 +248,18 @@ while(True):
 puzzle = AlgoSelector(method, initialState)
 node = puzzle.run()
 
-print(node.state)
+if(node):
+    print("\nGoal!!!")
+    print("\nTo solve this problem the search algorithm expanded a total of " + str(puzzle.totalExpanded) + " nodes.")
+    print("The maximum number of nodes in the queue at any one time: " + str(puzzle.maxQ))
+    print("The depth of the goal node was " + str(node.gval))
+
+    """
+    print("Would you like to show the goal path? y/n")
+    ans = input()
+    if(ans == "y"):
+        #printing goal path...
+    """
+
+else:
+    print("Failed to solve :(")
