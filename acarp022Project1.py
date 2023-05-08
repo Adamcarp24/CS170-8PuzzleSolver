@@ -6,10 +6,11 @@ import math
 ###
 
 class Node:
-    def __init__(self, state, gval, hval):
+    def __init__(self, state, gval, hval, parent):
         self.state = state
         self.gval = gval
         self.hval = hval
+        self.parent = parent
 
     def swap(self, i1, i2):
         temp = self.state[i2]
@@ -27,7 +28,7 @@ class Problem:
 
     def createChild(self, parent, direction, algoH):
         childState = parent.state.copy()
-        child = Node(childState, parent.gval + 1, 0)
+        child = Node(childState, parent.gval + 1, 0, parent)
         i = child.state.index(0)
 
         #move blank space
@@ -130,7 +131,7 @@ class AlgoSelector:
     def __init__(self, method,initial):
         self.method = method
         self.initial = initial
-        self.totalExpanded = 0
+        self.totalExpanded = -1
         self.maxQ = 1
 
     def run(self):
@@ -144,7 +145,7 @@ class AlgoSelector:
     #Uniform Cost Search
     def UCS(self):
         problem = Problem()
-        start = Node(self.initial, 0, 0)
+        start = Node(self.initial, 0, 0, None)
         problem.frontier.append(start)
 
         while(True):
@@ -171,7 +172,7 @@ class AlgoSelector:
     #A* with the Misplaced Tile heuristic or Euclidian Distance
     def AMT(self, code):
         problem = Problem()
-        start = Node(self.initial, 0, 0)
+        start = Node(self.initial, 0, 0, None)
         start.updateH(problem.tileH(self.initial))
         problem.frontier.append(start)
 
@@ -254,12 +255,26 @@ if(node):
     print("The maximum number of nodes in the queue at any one time: " + str(puzzle.maxQ))
     print("The depth of the goal node was " + str(node.gval))
 
-    """
-    print("Would you like to show the goal path? y/n")
+    
+    print("\nWould you like to show the exact goal path? y/n")
     ans = input()
     if(ans == "y"):
-        #printing goal path...
-    """
+        print("Printing goal path...")
+        goalList = [node]
+        while(node.parent != None):
+            #add parent into front of list
+            goalList.insert(0, node.parent)
+            node = node.parent
+        #print goal list
+        for i in range(0, len(goalList)):
+            if (i+1) == 1: print("Initial Puzzle")
+            else: print("Step " + str(i) + ": ")
+            for j in range(0, len(goalList[i].state)):
+                print(str(goalList[i].state[j]) + " ", end="")
+                if ((j+1)%3 == 0):
+                    print("")
+            print("")
+        print("Complete!")
 
 else:
     print("Failed to solve :(")
